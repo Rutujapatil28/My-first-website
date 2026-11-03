@@ -1,0 +1,40 @@
+name: Testing and Deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Test HTML File
+        run: |
+          test -f index.html
+          grep -q "GitHub Actions Practical" index.html
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Upload Website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy Website
+        uses: actions/deploy-pages@v4
